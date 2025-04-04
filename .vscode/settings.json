@@ -1,0 +1,27 @@
+{
+    "files.exclude": {
+        "**/dist": true,
+        "**/node_modules": true,
+    },
+    "actionButtons": {
+        "commands": [
+            {
+                "name": "Publish Changes Locally",
+                "singleInstance": true,
+                "command": "npm run local-install",
+                "saveAll": true,
+                "color": "lightgreen",
+            },
+            {
+                "name": "Build Tailwind",
+                "singleInstance": true,
+                "command": "npx tailwindcss -i ./src/static/input.css -o ./src/static/output.css --watch",
+                "saveAll": true,
+                "color": "lightgreen",
+            },
+        ],
+       "defaultColor": "white",
+       "reloadButton": null,
+       "loadNpmCommands": false
+    },
+}
