@@ -1,13 +1,23 @@
+import { PanelExtensionContext, ParameterValue } from "@foxglove/extension";
+
 import { Card, CardContent } from "../components/ui/card";
+import { Checkbox } from "../components/ui/checkbox";
 import { Label } from "../components/ui/label";
 import { Switch } from "../components/ui/switch";
-import { Checkbox } from "../components/ui/checkbox"
 
-function valueString(value: any, unit: string, decimalPlaces: number = 0, scalar: number = 1) {
-  return `${((value ?? 0) * scalar).toFixed(decimalPlaces)} ${unit}`;
-}
+import { Motor } from "@/schemas/Motor";
 
-export function MotorStatus({ motor }: { motor: any; name: string }) {
+export function MotorStatus({
+  motor,
+  parameters,
+  context,
+  name
+}: {
+  motor: Motor;
+  parameters: Map<string, ParameterValue>;
+  context: PanelExtensionContext;
+  name: string;
+}): JSX.Element {
   return (
     <Card className="w-[400px] m-4">
       <CardContent>
@@ -16,13 +26,13 @@ export function MotorStatus({ motor }: { motor: any; name: string }) {
             <div className="flex flex-row justify-between items-center">
               <div className="flex flex-col">
                 <p className="scroll-m-20 text-lg font-semibold tracking-tight">
-                  {valueString(motor?.inverter_actual_rpm, "RPM")}
+                  {motor.inverter_actual_rpm} RPM
                 </p>
                 <p className="scroll-m-20 text-sm tracking-tight">
-                  {valueString(motor?.inverter_actual_torque, "Nm")}
+                  {motor.inverter_actual_torque} Nm
                 </p>
               </div>
-              <Switch checked={true}></Switch>
+              <Switch checked={parameters.get("/zur_ecu.motor_"+name+"_enabled") as boolean} onCheckedChange={(checked) => {context.setParameter("/zur_ecu.motor_"+name+"_enabled", checked);}}></Switch>
             </div>
           </div>
 
@@ -30,15 +40,21 @@ export function MotorStatus({ motor }: { motor: any; name: string }) {
             <Label>Temperatures</Label>
             <div className="flex flex-row justify-between items-center">
               <p>Motor:</p>
-              <p>{valueString(motor?.motor_temp, "°C", 1, 0.1)} / {valueString(motor?.max_motor_temp, "°C", 1, 0.1)}</p>
+              <p>
+                {motor.motor_temp} °C/ {motor.max_motor_temp} °C
+              </p>
             </div>
             <div className="flex flex-row justify-between items-center">
               <p>Inverter:</p>
-              <p>{valueString(motor?.inverter_temp, "°C", 1, 0.1)} / {valueString(motor?.max_inverter_temp, "°C", 1, 0.1)}</p>
+              <p>
+                {motor.inverter_temp} °C/ {motor.max_inverter_temp} °C
+              </p>
             </div>
             <div className="flex flex-row justify-between items-center">
               <p>IGBT:</p>
-              <p>{valueString(motor?.igbt_temp, "°C", 1, 0.1)} / {valueString(motor?.max_igbp_temp, "°C", 1, 0.1)}</p>
+              <p>
+                {motor.igbt_temp} °C/ {motor.max_igbp_temp} °C
+              </p>
             </div>
           </div>
 
@@ -49,25 +65,25 @@ export function MotorStatus({ motor }: { motor: any; name: string }) {
               <div className="flex-grow flex flex-col space-y-1.5">
                 <div className="flex flex-row justify-between items-center">
                   <p>On:</p>
-                  <Checkbox checked={motor?.inverter_on ?? false} disabled></Checkbox>
+                  <Checkbox checked={motor.inverter_on} disabled></Checkbox>
                 </div>
                 <div className="flex flex-row justify-between items-center">
                   <p>DC On:</p>
-                  <Checkbox checked={motor?.inverter_dc_on ?? false} disabled></Checkbox>
+                  <Checkbox checked={motor.inverter_dc_on} disabled></Checkbox>
                 </div>
                 <div className="flex flex-row justify-between items-center">
                   <p>Ready:</p>
-                  <Checkbox checked={motor?.inverter_system_ready ?? false} disabled></Checkbox>
+                  <Checkbox checked={motor.inverter_system_ready} disabled></Checkbox>
                 </div>
               </div>
               <div className="flex-grow flex flex-col space-y-1.5">
                 <div className="flex flex-row justify-between items-center">
                   <p>Derating:</p>
-                  <Checkbox checked={motor?.inverter_derating ?? false} disabled></Checkbox>
+                  <Checkbox checked={motor.inverter_derating} disabled></Checkbox>
                 </div>
                 <div className="flex flex-row justify-between items-center">
                   <p>Error:</p>
-                  <Checkbox checked={motor?.inverter_error ?? false} disabled></Checkbox>
+                  <Checkbox checked={motor.inverter_error} disabled></Checkbox>
                 </div>
               </div>
             </div>
