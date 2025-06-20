@@ -18,7 +18,6 @@ function MainPanel({ context }: { context: PanelExtensionContext }): JSX.Element
   const [parameters, setParameters] = useState<Map<string, ParameterValue>>();
   const { theme, setTheme } = useTheme();
   // const [messages, setMessages] = useState<undefined | Immutable<MessageEvent[]>>();
-  // const [theme, setTheme] = useState<"dark" | "light">("light");
 
   const [renderDone, setRenderDone] = useState<(() => void) | undefined>();
 
@@ -51,14 +50,6 @@ function MainPanel({ context }: { context: PanelExtensionContext }): JSX.Element
   useEffect(() => {
     renderDone?.();
   }, [renderDone]);
-
-  // useEffect(() => {
-  //   const root = window.document.documentElement;
-
-  //   root.classList.remove("light", "dark");
-
-  //   root.classList.add(theme);
-  // }, [theme]);
   
   return (
       <Tabs defaultValue="drivetrain" className="" >

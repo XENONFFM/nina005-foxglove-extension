@@ -48,6 +48,7 @@
     "typescript": "5.7.2"
   },
   "dependencies": {
+    "@radix-ui/react-select": "^2.2.5",
     "@radix-ui/react-tabs": "^1.1.12",
     "@tailwindcss/cli": "^4.1.10",
     "class-variance-authority": "^0.7.1",
