@@ -1,8 +1,9 @@
 import { ExtensionContext } from "@foxglove/extension";
 
-import { initDrivetrainPanel } from "./panels/DrivetrainPanel";
-import "./static/output.css";
+import { initMainPanel } from "./MainPanel";
+import "./styles/globals.css";
+import "./styles/output.css";
 
 export function activate(extensionContext: ExtensionContext): void {
-  extensionContext.registerPanel({ name: "Drivetrain", initPanel: initDrivetrainPanel });
+  extensionContext.registerPanel({ name: "Drivetrain", initPanel: initMainPanel });
 }
