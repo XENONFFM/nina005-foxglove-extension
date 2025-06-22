@@ -52,7 +52,7 @@ function MainPanel({ context }: { context: PanelExtensionContext }): JSX.Element
   }, [renderDone]);
   
   return (
-      <Tabs defaultValue="drivetrain" className="" >
+      <Tabs defaultValue="drivetrain" >
         <TabsList className="w-[400px] m-4 mx-auto">
           <TabsTrigger value="drivetrain" >Drivetrain</TabsTrigger>
           <TabsTrigger value="driverless" >Driverless</TabsTrigger>
