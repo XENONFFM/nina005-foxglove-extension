@@ -1,92 +1,78 @@
-import { PanelExtensionContext, ParameterValue } from "@foxglove/extension";
+import React from "react";
 
-import { Card, CardContent } from "../components/ui/card";
-import { Checkbox } from "../components/ui/checkbox";
+import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Label } from "../components/ui/label";
-import { Switch } from "../components/ui/switch";
 
-import { Motor } from "@/schemas/Motor";
+import { RawSignalVehicleSpeed } from "@/schemas/RawSignalVehicleSpeed";
+import { ScaledSignals } from "@/schemas/ScaledSignals";
+import { SteeringAndSpeed } from "@/schemas/SteeringAndSpeed";
+
+type MotorStatusProps = {
+  scaledSignals?: ScaledSignals;
+  steeringAndSpeed?: SteeringAndSpeed;
+  rawSignalVehicleSpeed?: RawSignalVehicleSpeed;
+};
+
+function formatValue(value: number | undefined, digits = 0): string {
+  if (value === undefined || value === null) {
+    return "--";
+  }
+  return value.toFixed(digits);
+}
 
 export function MotorStatus({
-  motor,
-  parameters,
-  context,
-  name
-}: {
-  motor: Motor;
-  parameters: Map<string, ParameterValue>;
-  context: PanelExtensionContext;
-  name: string;
-}): JSX.Element {
+  scaledSignals,
+  steeringAndSpeed,
+  rawSignalVehicleSpeed,
+}: MotorStatusProps): JSX.Element {
   return (
-    <Card className="w-[400px] m-4">
+    <Card className="">
+      <CardHeader>
+        <CardTitle className="text-base">Drive Signals</CardTitle>
+      </CardHeader>
       <CardContent>
-        <div className="flex flex-col gap-4">
-          <div className="flex flex-col space-y-1.5">
-            <div className="flex flex-row justify-between items-center">
-              <div className="flex flex-col">
-                <p className="scroll-m-20 text-lg font-semibold tracking-tight">
-                  {motor.inverter_actual_rpm} RPM
-                </p>
-                <p className="scroll-m-20 text-sm tracking-tight">
-                  {motor.inverter_actual_torque} Nm
-                </p>
-              </div>
-              <Switch checked={parameters.get("/zur_ecu.motor_"+name+"_enabled") as boolean} onCheckedChange={(checked) => {context.setParameter("/zur_ecu.motor_"+name+"_enabled", checked);}}></Switch>
-            </div>
+        <div className="flex flex-col gap-3 text-sm">
+          <div className="flex items-center justify-between">
+            <Label>Throttle</Label>
+            <span className="font-medium">{formatValue(scaledSignals?.throttle_signal, 0)}</span>
           </div>
-
-          <div className="flex flex-col space-y-1.5">
-            <Label>Temperatures</Label>
-            <div className="flex flex-row justify-between items-center">
-              <p>Motor:</p>
-              <p>
-                {motor.motor_temp} °C/ {motor.max_motor_temp} °C
-              </p>
-            </div>
-            <div className="flex flex-row justify-between items-center">
-              <p>Inverter:</p>
-              <p>
-                {motor.inverter_temp} °C/ {motor.max_inverter_temp} °C
-              </p>
-            </div>
-            <div className="flex flex-row justify-between items-center">
-              <p>IGBT:</p>
-              <p>
-                {motor.igbt_temp} °C/ {motor.max_igbp_temp} °C
-              </p>
-            </div>
+          <div className="flex items-center justify-between">
+            <Label>Brake</Label>
+            <span className="font-medium">{formatValue(scaledSignals?.brake_signal, 0)}</span>
           </div>
-
-          <div className="flex flex-col space-y-1.5">
-            <Label>Inverter</Label>
-
-            <div className="flex flex-row gap-4">
-              <div className="flex-grow flex flex-col space-y-1.5">
-                <div className="flex flex-row justify-between items-center">
-                  <p>On:</p>
-                  <Checkbox checked={motor.inverter_on} disabled></Checkbox>
-                </div>
-                <div className="flex flex-row justify-between items-center">
-                  <p>DC On:</p>
-                  <Checkbox checked={motor.inverter_dc_on} disabled></Checkbox>
-                </div>
-                <div className="flex flex-row justify-between items-center">
-                  <p>Ready:</p>
-                  <Checkbox checked={motor.inverter_system_ready} disabled></Checkbox>
-                </div>
-              </div>
-              <div className="flex-grow flex flex-col space-y-1.5">
-                <div className="flex flex-row justify-between items-center">
-                  <p>Derating:</p>
-                  <Checkbox checked={motor.inverter_derating} disabled></Checkbox>
-                </div>
-                <div className="flex flex-row justify-between items-center">
-                  <p>Error:</p>
-                  <Checkbox checked={motor.inverter_error} disabled></Checkbox>
-                </div>
-              </div>
-            </div>
+          <div className="flex items-center justify-between">
+            <Label>Steering Torque</Label>
+            <span className="font-medium">
+              {formatValue(scaledSignals?.steering_torque_signal, 0)}
+            </span>
+          </div>
+          <div className="flex items-center justify-between">
+            <Label>Steering Motor Cmd</Label>
+            <span className="font-medium">
+              {formatValue(scaledSignals?.steering_motor_speed_cmd, 0)}
+            </span>
+          </div>
+          <div className="flex items-center justify-between">
+            <Label>Steering Velocity</Label>
+            <span className="font-medium">
+              {formatValue(scaledSignals?.steering_velocity_signal, 0)}
+            </span>
+          </div>
+          <div className="flex items-center justify-between">
+            <Label>Curtis Speed Cmd</Label>
+            <span className="font-medium">{formatValue(scaledSignals?.curtis_speed_cmd, 0)}</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <Label>Speed Measured</Label>
+            <span className="font-medium">
+              {formatValue(steeringAndSpeed?.vehicle_velocity_measured, 2)}
+            </span>
+          </div>
+          <div className="flex items-center justify-between">
+            <Label>Speed Raw</Label>
+            <span className="font-medium">
+              {formatValue(rawSignalVehicleSpeed?.uint8_vehicle_speed, 2)}
+            </span>
           </div>
         </div>
       </CardContent>

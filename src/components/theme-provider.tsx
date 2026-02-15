@@ -1,12 +1,6 @@
-import React, {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  useCallback,
-} from "react";
+import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
 
-export type Theme = "dark" | "light";
+export type Theme = "dark" | "light" | "system";
 
 type ThemeProviderProps = {
   children: React.ReactNode;
@@ -25,9 +19,11 @@ export function ThemeProvider({
   children,
   defaultTheme = "dark",
   storageKey = "ui-theme",
-}: ThemeProviderProps) {
+}: ThemeProviderProps): JSX.Element {
   const [theme, setThemeState] = useState<Theme>(() => {
-    if (typeof window === "undefined") return defaultTheme;
+    if (typeof window === "undefined") {
+      return defaultTheme;
+    }
     const stored = localStorage.getItem(storageKey);
     return stored === "light" || stored === "dark" ? stored : defaultTheme;
   });
@@ -47,11 +43,7 @@ export function ThemeProvider({
 
   const value = { theme, setTheme };
 
-  return (
-    <ThemeProviderContext.Provider value={value}>
-      {children}
-    </ThemeProviderContext.Provider>
-  );
+  return <ThemeProviderContext.Provider value={value}>{children}</ThemeProviderContext.Provider>;
 }
 
 export const useTheme = () => {
