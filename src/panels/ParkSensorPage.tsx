@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import { type ReactElement } from "react";
 
 import {
   ParkSensorDisplay,
@@ -34,25 +34,31 @@ function mapSensorsToDisplay(front?: USSensorFront, rear?: USSensorRear): ParkSe
 interface ParkSensorPageProps {
   usSensorFront?: USSensorFront;
   usSensorRear?: USSensorRear;
+  showDisplay?: boolean;
+  showControls?: boolean;
 }
 
 export default function ParkSensorPage({
   usSensorFront,
   usSensorRear,
-}: ParkSensorPageProps): JSX.Element {
+  showDisplay = true,
+  showControls = true,
+}: ParkSensorPageProps): ReactElement {
   const sensors = mapSensorsToDisplay(usSensorFront, usSensorRear);
 
   return (
     <main className="flex flex-row lg:flex-row items-center justify-center gap-10 p-6">
-      <ParkSensorDisplay sensors={sensors} width={480} height={680} />
-      <Card className="w-sm">
-        <CardHeader>
-          <h2 className="text-base font-semibold mb-5 tracking-wide">Ultrasonic Sensors</h2>
-        </CardHeader>
-        <CardContent>
-          <SensorControls sensors={sensors} />
-        </CardContent>
-      </Card>
+      {showDisplay && <ParkSensorDisplay sensors={sensors} width={480} height={680} />}
+      {showControls && (
+        <Card className="w-fit max-w-full min-w-xs">
+          <CardHeader>
+            <h2 className="text-base font-semibold mb-5 tracking-wide">Ultrasonic Sensors</h2>
+          </CardHeader>
+          <CardContent>
+            <SensorControls sensors={sensors} />
+          </CardContent>
+        </Card>
+      )}
     </main>
   );
 }

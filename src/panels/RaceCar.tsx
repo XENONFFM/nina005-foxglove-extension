@@ -1,5 +1,3 @@
-import React from "react";
-
 import nina005 from "../assets/Nina005.png";
 
 export function RaceCar(): JSX.Element {

@@ -1,26 +1,18 @@
 {
   "extends": "create-foxglove-extension/tsconfig/tsconfig.json",
-
-  "include": ["./src/**/*"],
+  "include": ["./src/**/*", "dev"],
   "compilerOptions": {
-    "jsx": "react",
-    "baseUrl": "./src",
-    "rootDir": "./src",
+    "baseUrl": ".",
+    "rootDir": ".",
     "outDir": "./dist",
     "lib": ["dom"],
-  
+    "jsx": "react-jsx",
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./src/*"],
+      "@dev/*": ["./dev/*"]
     },
-
-    // These two settings prevent typescript from emitting .d.ts files we don't need in
-    // the compiled extension.
     "composite": false,
     "declaration": false,
-
-    // Additional TypeScript error reporting checks are enabled by default to improve code quality.
-    // Enable/disable these checks as necessary to suit your coding preferences or work with
-    // existing code
     "noFallthroughCasesInSwitch": true,
     "noImplicitAny": true,
     "noImplicitReturns": true,
@@ -28,5 +20,5 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "forceConsistentCasingInFileNames": true
-  },
+  }
 }

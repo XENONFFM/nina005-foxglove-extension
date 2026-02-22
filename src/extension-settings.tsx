@@ -8,6 +8,10 @@ type MainPanelSettings = {
     defaultTab: string;
     hideMenuBar: boolean;
   };
+  parkSensors: {
+    hideDisplay: boolean;
+    hideControls: boolean;
+  };
 };
 
 const TAB_OPTIONS = [
@@ -24,6 +28,10 @@ function getInitialSettings(context: PanelExtensionContext): MainPanelSettings {
     tabs: {
       defaultTab: partialState.tabs?.defaultTab ?? "drivetrain",
       hideMenuBar: partialState.tabs?.hideMenuBar ?? false,
+    },
+    parkSensors: {
+      hideDisplay: partialState.parkSensors?.hideDisplay ?? false,
+      hideControls: partialState.parkSensors?.hideControls ?? false,
     },
   };
 }
@@ -56,6 +64,22 @@ export function useMainPanelSettings(context: PanelExtensionContext): MainPanelS
               label: "Hide Menu Bar",
               input: "boolean",
               value: settings.tabs.hideMenuBar,
+            },
+          },
+        },
+        parkSensors: {
+          label: "Park Sensors",
+          icon: "Settings",
+          fields: {
+            hideDisplay: {
+              label: "Hide Display",
+              input: "boolean",
+              value: settings.parkSensors.hideDisplay,
+            },
+            hideControls: {
+              label: "Hide Controls",
+              input: "boolean",
+              value: settings.parkSensors.hideControls,
             },
           },
         },

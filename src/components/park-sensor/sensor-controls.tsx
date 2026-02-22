@@ -1,10 +1,11 @@
 "use client";
 
-import React from "react";
+import { ReactElement } from "react";
 
 import type { ParkSensorData } from "./park-sensor-display";
-import { Label } from "../ui/label";
-import { Separator } from "../ui/separator";
+
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
 
 interface SensorControlsProps {
   sensors: ParkSensorData;
@@ -34,7 +35,7 @@ function getZoneColor(value: number): string {
   return "#DC2626";
 }
 
-export function SensorControls({ sensors }: SensorControlsProps): JSX.Element {
+export function SensorControls({ sensors }: SensorControlsProps): ReactElement {
   const groups = ["Front", "Rear"];
 
   return (
@@ -72,6 +73,8 @@ export function SensorControls({ sensors }: SensorControlsProps): JSX.Element {
                         } else {
                           barColor = "#DC2626";
                         }
+                      } else {
+                        barColor = "var(--inactive)";
                       }
                       return (
                         <button

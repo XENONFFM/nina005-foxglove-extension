@@ -1,5 +1,3 @@
-import React from "react";
-
 import { MotorStatus } from "./MotorStatus";
 import { RaceCar } from "./RaceCar";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
@@ -64,7 +62,7 @@ export function DriveTrain({
   rawSignalVehicleSpeed,
 }: DrivetrainProps): JSX.Element {
   return (
-    <div className="grid grid-cols-3 gap-4 w-full p-4">
+    <div className="grid grid-cols-3 gap-6 w-full p-4">
       <div className="flex flex-col gap-4">
         <MotorStatus
           scaledSignals={scaledSignals}

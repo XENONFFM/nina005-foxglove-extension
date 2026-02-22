@@ -1,11 +1,13 @@
-import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 
-export type Theme = "dark" | "light" | "system";
+type Theme = "dark" | "light" | "system";
+type ForcedTheme = Exclude<Theme, "system">;
 
 type ThemeProviderProps = {
-  children: React.ReactNode;
+  children: ReactNode;
   defaultTheme?: Theme;
   storageKey?: string;
+  forcedTheme?: ForcedTheme;
 };
 
 type ThemeProviderState = {
@@ -13,43 +15,64 @@ type ThemeProviderState = {
   setTheme: (theme: Theme) => void;
 };
 
-const ThemeProviderContext = createContext<ThemeProviderState | undefined>(undefined);
+const initialState: ThemeProviderState = {
+  theme: "system",
+  setTheme: () => null,
+};
+
+const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
 
 export function ThemeProvider({
   children,
-  defaultTheme = "dark",
-  storageKey = "ui-theme",
-}: ThemeProviderProps): JSX.Element {
-  const [theme, setThemeState] = useState<Theme>(() => {
-    if (typeof window === "undefined") {
-      return defaultTheme;
+  defaultTheme = "system",
+  storageKey = "vite-ui-theme",
+  forcedTheme,
+  ...props
+}: ThemeProviderProps): React.JSX.Element {
+  const [theme, setTheme] = useState<Theme>(() => {
+    const storedTheme = localStorage.getItem(storageKey);
+
+    if (storedTheme === "light" || storedTheme === "dark" || storedTheme === "system") {
+      return storedTheme;
     }
-    const stored = localStorage.getItem(storageKey);
-    return stored === "light" || stored === "dark" ? stored : defaultTheme;
+
+    return defaultTheme;
   });
 
-  // Set HTML root class and sync with localStorage
+  const resolvedTheme: ForcedTheme =
+    forcedTheme ??
+    (theme === "system"
+      ? window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light"
+      : theme);
+
   useEffect(() => {
     const root = window.document.documentElement;
+
     root.classList.remove("light", "dark");
-    root.classList.add(theme);
-    localStorage.setItem(storageKey, theme);
-  }, [theme]);
 
-  // Stable callback to avoid stale closures
-  const setTheme = useCallback((newTheme: Theme) => {
-    setThemeState(newTheme);
-  }, []);
+    root.classList.add(resolvedTheme);
+  }, [resolvedTheme]);
 
-  const value = { theme, setTheme };
+  const value = {
+    theme: forcedTheme ?? theme,
+    setTheme: (nextTheme: Theme) => {
+      if (forcedTheme != undefined) {
+        return;
+      }
+      localStorage.setItem(storageKey, nextTheme);
+      setTheme(nextTheme);
+    },
+  };
 
-  return <ThemeProviderContext.Provider value={value}>{children}</ThemeProviderContext.Provider>;
+  return (
+    <ThemeProviderContext.Provider {...props} value={value}>
+      {children}
+    </ThemeProviderContext.Provider>
+  );
 }
 
-export const useTheme = () => {
-  const context = useContext(ThemeProviderContext);
-  if (!context) {
-    throw new Error("useTheme must be used within a ThemeProvider");
-  }
-  return context;
+export const useTheme = (): ThemeProviderState => {
+  return useContext(ThemeProviderContext);
 };

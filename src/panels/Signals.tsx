@@ -1,5 +1,3 @@
-import React from "react";
-
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Label } from "../components/ui/label";
 
@@ -11,6 +9,7 @@ import { RawSignalSteeringVelocityCmd } from "@/schemas/RawSignalSteeringVelocit
 import { RawSignalThrottle } from "@/schemas/RawSignalThrottle";
 import { RawSignalThrottlePotiCmd } from "@/schemas/RawSignalThrottlePotiCmd";
 import { RawSignalVehicleSpeed } from "@/schemas/RawSignalVehicleSpeed";
+import { ReactElement } from "react";
 
 type SignalsPanelProps = {
   rawSignalBrake?: RawSignalBrake;
@@ -48,7 +47,7 @@ export function SignalsPanel({
   rawSignalSteeringVelocityCmd,
   rawSignalThrottlePotiCmd,
   rawSignalVehicleSpeed,
-}: SignalsPanelProps): JSX.Element {
+}: SignalsPanelProps): ReactElement {
   return (
     <div className="grid grid-cols-3 gap-4 p-4">
       <Card>

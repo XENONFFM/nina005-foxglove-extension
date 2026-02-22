@@ -55,3 +55,4 @@ __fixtures__/custom-modules-dir/cache/
 __fixtures__/custom-modules-dir/patches/
 
 .pnpm-store
+*.foxe
