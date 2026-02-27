@@ -5,11 +5,10 @@ import { type ReactElement } from "react";
 import {
   ParkSensorDisplay,
   type ParkSensorData,
-} from "../components/park-sensor/park-sensor-display";
-import { SensorControls } from "../components/park-sensor/sensor-controls";
-import { USSensorFront, USSensorRear } from "../schemas";
-
+} from "@/components/park-sensor/park-sensor-display";
+import { SensorControls } from "@/components/park-sensor/sensor-controls";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { USSensorFront, USSensorRear } from "@/schemas";
 
 /**
  * Maps USSensorFront and USSensorRear ROS messages to ParkSensorData format
@@ -31,19 +30,19 @@ function mapSensorsToDisplay(front?: USSensorFront, rear?: USSensorRear): ParkSe
   };
 }
 
-interface ParkSensorPageProps {
+interface UsSensorsProps {
   usSensorFront?: USSensorFront;
   usSensorRear?: USSensorRear;
   showDisplay?: boolean;
   showControls?: boolean;
 }
 
-export default function ParkSensorPage({
+export function UsSensors({
   usSensorFront,
   usSensorRear,
   showDisplay = true,
   showControls = true,
-}: ParkSensorPageProps): ReactElement {
+}: UsSensorsProps): ReactElement {
   const sensors = mapSensorsToDisplay(usSensorFront, usSensorRear);
 
   return (

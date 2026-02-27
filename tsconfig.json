@@ -5,8 +5,10 @@
     "baseUrl": ".",
     "rootDir": ".",
     "outDir": "./dist",
-    "lib": ["dom"],
+    "lib": ["dom", "es2020"],
     "jsx": "react-jsx",
+    "types": ["react", "react-dom"],
+
     "paths": {
       "@/*": ["./src/*"],
       "@dev/*": ["./dev/*"]

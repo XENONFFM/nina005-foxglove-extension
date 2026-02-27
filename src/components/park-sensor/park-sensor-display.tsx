@@ -3,7 +3,8 @@
 import { ReactElement } from "react";
 
 import { SensorArc } from "./sensor-arc";
-import nina005 from "../../assets/Nina005.png";
+
+import nina005 from "@/assets/Nina005.png";
 
 /**
  * ParkSensorData

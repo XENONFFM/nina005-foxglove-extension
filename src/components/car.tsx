@@ -1,6 +1,8 @@
-import nina005 from "../assets/Nina005.png";
+import { ReactElement } from "react";
 
-export function RaceCar(): JSX.Element {
+import nina005 from "@/assets/Nina005.png";
+
+export function Car(): ReactElement {
   return (
     <div className="flex flex-col items-center justify-center gap-3 w-full h-full">
       <img

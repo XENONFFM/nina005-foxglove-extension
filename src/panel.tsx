@@ -3,10 +3,9 @@ import { useEffect, useLayoutEffect, useMemo, useState } from "react";
 import type { ReactElement } from "react";
 import { createRoot } from "react-dom/client";
 
-import { MainTabs } from "./components/main-tabs";
-import { ThemeProvider } from "./components/theme-provider";
-import { useMainPanelSettings } from "./extension-settings";
-
+import { usePanelSettings } from "@/components/extension-settings";
+import { App } from "@/app";
+import { ThemeProvider } from "@/components/theme-provider";
 import {
   ApplicationStatus,
   BatteryStatus,
@@ -53,9 +52,8 @@ const TOPICS = {
   remoteApplicationToggleRequest: `${prefix}/remote_application_toggle_request`,
 } as const;
 
-function MainPanel({ context }: { context: PanelExtensionContext }): ReactElement {
-  const settings = useMainPanelSettings(context);
-  const [foxgloveTheme, setFoxgloveTheme] = useState<"light" | "dark">("dark");
+function Panel({ context }: { context: PanelExtensionContext }): ReactElement {
+  const settings = usePanelSettings(context);
   const [applicationStatus, setApplicationStatus] = useState<ApplicationStatus>();
   const [batteryStatus, setBatteryStatus] = useState<BatteryStatus>();
   const [generalVehicleStatus, setGeneralVehicleStatus] = useState<GeneralVehicleStatus>();
@@ -150,10 +148,6 @@ function MainPanel({ context }: { context: PanelExtensionContext }): ReactElemen
     context.onRender = (renderState, done) => {
       setRenderDone(() => done);
 
-      if (renderState.colorScheme === "light" || renderState.colorScheme === "dark") {
-        setFoxgloveTheme(renderState.colorScheme);
-      }
-
       if (renderState.currentFrame) {
         for (const event of renderState.currentFrame) {
           if (event.topic in topicHandlers) {
@@ -165,7 +159,6 @@ function MainPanel({ context }: { context: PanelExtensionContext }): ReactElemen
     };
 
     context.watch("currentFrame");
-    context.watch("colorScheme");
 
     context.subscribe(Object.values(TOPICS).map((topic) => ({ topic })));
   }, [context, topicHandlers]);
@@ -226,8 +219,8 @@ function MainPanel({ context }: { context: PanelExtensionContext }): ReactElemen
   );
 
   return (
-    <ThemeProvider defaultTheme="system" forcedTheme={foxgloveTheme}>
-      <MainTabs
+    <ThemeProvider defaultTheme="system">
+      <App
         data={panelData}
         activeTab={activeTab}
         onTabChange={setActiveTab}
@@ -240,12 +233,12 @@ function MainPanel({ context }: { context: PanelExtensionContext }): ReactElemen
   );
 }
 
-export function initMainPanel(context: PanelExtensionContext): () => void {
+export function initPanel(context: PanelExtensionContext): () => void {
   const root = createRoot(context.panelElement);
 
   root.render(
     <div className="h-full w-full bg-background">
-      <MainPanel context={context} />
+      <Panel context={context} />
     </div>,
   );
 

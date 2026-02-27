@@ -3,7 +3,7 @@ import { produce } from "immer";
 import { set } from "lodash";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-type MainPanelSettings = {
+type PanelSettings = {
   tabs: {
     defaultTab: string;
     hideMenuBar: boolean;
@@ -15,6 +15,8 @@ type MainPanelSettings = {
 };
 
 const TAB_OPTIONS = [
+  { value: "cluster", label: "Cluster" },
+  { value: "dashboard", label: "Dashboard" },
   { value: "drivetrain", label: "Drivetrain" },
   { value: "signals", label: "Signals" },
   { value: "status", label: "Status" },
@@ -22,8 +24,8 @@ const TAB_OPTIONS = [
   { value: "parking", label: "Park sensors" },
 ];
 
-function getInitialSettings(context: PanelExtensionContext): MainPanelSettings {
-  const partialState = context.initialState as Partial<MainPanelSettings>;
+function getInitialSettings(context: PanelExtensionContext): PanelSettings {
+  const partialState = context.initialState as Partial<PanelSettings>;
   return {
     tabs: {
       defaultTab: partialState.tabs?.defaultTab ?? "drivetrain",
@@ -36,8 +38,8 @@ function getInitialSettings(context: PanelExtensionContext): MainPanelSettings {
   };
 }
 
-export function useMainPanelSettings(context: PanelExtensionContext): MainPanelSettings {
-  const [settings, setSettings] = useState<MainPanelSettings>(() => getInitialSettings(context));
+export function usePanelSettings(context: PanelExtensionContext): PanelSettings {
+  const [settings, setSettings] = useState<PanelSettings>(() => getInitialSettings(context));
 
   const actionHandler = useCallback((action: SettingsTreeAction) => {
     if (action.action === "update") {

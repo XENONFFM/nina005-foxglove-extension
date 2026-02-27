@@ -1,4 +1,5 @@
 import * as React from "react";
+import { ReactElement } from "react";
 
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
@@ -9,7 +10,7 @@ export function SettingsSection({
 }: {
   title?: string;
   children: React.ReactNode;
-}): React.JSX.Element {
+}): ReactElement {
   const childrenArray = React.Children.toArray(children);
 
   return (
@@ -39,7 +40,7 @@ export function SettingsItem({
   label: string;
   description?: string;
   children: React.ReactNode;
-}): JSX.Element {
+}): ReactElement {
   return (
     <div className="px-4 py-3 first:pt-3 last:pb-3">
       <div className="flex items-center justify-between gap-4 mb-2">
@@ -57,7 +58,7 @@ export function SettingsValue({
 }: {
   mono?: boolean;
   children: React.ReactNode;
-}): JSX.Element {
+}): ReactElement {
   return (
     <span className={`text-sm font-medium text-muted-foreground ${mono ? "font-mono" : ""}`}>
       {children}
