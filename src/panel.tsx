@@ -3,8 +3,8 @@ import { useEffect, useLayoutEffect, useMemo, useState } from "react";
 import type { ReactElement } from "react";
 import { createRoot } from "react-dom/client";
 
-import { usePanelSettings } from "@/components/extension-settings";
 import { App } from "@/app";
+import { usePanelSettings } from "@/components/extension-settings";
 import { ThemeProvider } from "@/components/theme-provider";
 import {
   ApplicationStatus,

@@ -1,5 +1,4 @@
 import * as React from "react";
-import { ReactElement } from "react";
 
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
@@ -10,7 +9,7 @@ export function SettingsSection({
 }: {
   title?: string;
   children: React.ReactNode;
-}): ReactElement {
+}): React.ReactElement {
   const childrenArray = React.Children.toArray(children);
 
   return (
@@ -24,7 +23,7 @@ export function SettingsSection({
         {childrenArray.map((child, index) => (
           <React.Fragment key={index}>
             {child}
-            {index < childrenArray.length - 1 && <Separator className="mx-4" />}
+            {index < childrenArray.length - 1 && <Separator className="mx-4 h-px bg-border" />}
           </React.Fragment>
         ))}
       </div>
@@ -40,11 +39,11 @@ export function SettingsItem({
   label: string;
   description?: string;
   children: React.ReactNode;
-}): ReactElement {
+}): React.ReactElement {
   return (
     <div className="px-4 py-3 first:pt-3 last:pb-3">
       <div className="flex items-center justify-between gap-4 mb-2">
-        <Label className="text-sm font-medium">{label}</Label>
+        <Label className="text-sm font-extralight">{label}</Label>
         {children}
       </div>
       {description && <p className="text-xs text-muted-foreground">{description}</p>}
@@ -58,7 +57,7 @@ export function SettingsValue({
 }: {
   mono?: boolean;
   children: React.ReactNode;
-}): ReactElement {
+}): React.ReactElement {
   return (
     <span className={`text-sm font-medium text-muted-foreground ${mono ? "font-mono" : ""}`}>
       {children}
