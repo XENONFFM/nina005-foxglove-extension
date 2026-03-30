@@ -12,6 +12,9 @@ export type PanelSettings = {
     defaultTab: PanelTab;
     hideMenuBar: boolean;
   };
+  testing: {
+    autoRefreshValues: boolean;
+  };
   parkSensors: {
     hideDisplay: boolean;
     hideControls: boolean;

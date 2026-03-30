@@ -9,7 +9,9 @@ import {
 } from "@/config";
 
 export function usePanelSettings(context: PanelExtensionContext): PanelSettings {
-  const [settings, setSettings] = useState<PanelSettings>(() => createDefaultPanelSettings(context));
+  const [settings, setSettings] = useState<PanelSettings>(() =>
+    createDefaultPanelSettings(context),
+  );
 
   const actionHandler = useCallback((action: SettingsTreeAction) => {
     setSettings((prevSettings) => settingsActionReducer(prevSettings, action));

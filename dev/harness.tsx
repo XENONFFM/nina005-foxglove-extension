@@ -8,7 +8,6 @@ import { SettingsSheet } from "@dev/components/settings-sheet";
 import { PanelExtensionContext } from "@foxglove/extension";
 
 export function Harness({ context }: { context: PanelExtensionContext }): ReactElement {
-  const [autoRefresh] = useState<boolean>(false);
   const settings = usePanelSettings(context);
   const [data, setData] = useState(() => createMockData());
   const [activeTab, setActiveTab] = useState<string>(settings.tabs.defaultTab);
@@ -18,7 +17,7 @@ export function Harness({ context }: { context: PanelExtensionContext }): ReactE
   }, []);
 
   useEffect(() => {
-    if (!autoRefresh) {
+    if (!settings.testing.autoRefreshValues) {
       return;
     }
 
@@ -29,7 +28,7 @@ export function Harness({ context }: { context: PanelExtensionContext }): ReactE
     return () => {
       window.clearInterval(intervalId);
     };
-  }, [autoRefresh, randomize]);
+  }, [settings.testing.autoRefreshValues, randomize]);
 
   useEffect(() => {
     setActiveTab(settings.tabs.defaultTab);

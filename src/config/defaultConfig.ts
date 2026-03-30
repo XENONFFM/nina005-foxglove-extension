@@ -17,6 +17,9 @@ export const DEFAULT_PANEL_SETTINGS: PanelSettings = {
     defaultTab: "drivetrain",
     hideMenuBar: false,
   },
+  testing: {
+    autoRefreshValues: false,
+  },
   parkSensors: {
     hideDisplay: false,
     hideControls: false,
@@ -43,6 +46,9 @@ export function resolvePanelSettings(...sources: Array<unknown>): PanelSettings 
       defaultTab: DEFAULT_PANEL_SETTINGS.tabs.defaultTab,
       hideMenuBar: DEFAULT_PANEL_SETTINGS.tabs.hideMenuBar,
     },
+    testing: {
+      autoRefreshValues: DEFAULT_PANEL_SETTINGS.testing.autoRefreshValues,
+    },
     parkSensors: {
       hideDisplay: DEFAULT_PANEL_SETTINGS.parkSensors.hideDisplay,
       hideControls: DEFAULT_PANEL_SETTINGS.parkSensors.hideControls,
@@ -56,6 +62,7 @@ export function resolvePanelSettings(...sources: Array<unknown>): PanelSettings 
     }
 
     const tabs = asRecord(root.tabs);
+    const testing = asRecord(root.testing);
     const parkSensors = asRecord(root.parkSensors);
 
     const defaultTab = asPanelTab(tabs?.defaultTab);
@@ -65,6 +72,10 @@ export function resolvePanelSettings(...sources: Array<unknown>): PanelSettings 
 
     if (typeof tabs?.hideMenuBar === "boolean") {
       resolved.tabs.hideMenuBar = tabs.hideMenuBar;
+    }
+
+    if (typeof testing?.autoRefreshValues === "boolean") {
+      resolved.testing.autoRefreshValues = testing.autoRefreshValues;
     }
 
     if (typeof parkSensors?.hideDisplay === "boolean") {

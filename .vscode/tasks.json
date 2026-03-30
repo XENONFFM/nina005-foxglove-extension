@@ -1,0 +1,69 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Build Tailwind CSS",
+      "type": "shell",
+      "command": "npx",
+      "args": [
+        "@tailwindcss/cli",
+        "-i",
+        "./src/styles/globals.css",
+        "-o",
+        "./src/styles/output.css"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Watch Tailwind CSS",
+      "type": "shell",
+      "command": "npx",
+      "args": [
+        "@tailwindcss/cli",
+        "-i",
+        "./src/styles/globals.css",
+        "-o",
+        "./src/styles/output.css",
+        "--watch"
+      ],
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "tailwind-watch",
+        "pattern": [
+          {
+            "regexp": ".",
+            "file": 1,
+            "location": 2,
+            "message": 3
+          }
+        ],
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".",
+          "endsPattern": "."
+        }
+      },
+      "group": "build"
+    },
+    {
+      "label": "Local Install",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["run", "local-install"],
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "Run DEV server",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["run", "dev"],
+      "group": "none",
+      "problemMatcher": []
+    }
+  ]
+}

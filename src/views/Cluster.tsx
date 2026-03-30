@@ -2,11 +2,12 @@ import {
   BellIcon,
   CirclePowerIcon,
   LightbulbIcon,
+  NavigationIcon,
   RotateCcwIcon,
   TriangleAlertIcon,
   TriangleIcon,
 } from "lucide-react";
-import { type ReactElement, useEffect, useRef } from "react";
+import { type ReactElement } from "react";
 
 import nina005 from "@/assets/Nina005.png";
 import { Badge } from "@/components/ui/badge";
@@ -85,336 +86,108 @@ function HeaderMetric({ label, value }: { label: string; value: string }): React
   );
 }
 
-function drawRoundedSquare(
-  ctx: CanvasRenderingContext2D,
-  cx: number,
-  cy: number,
-  w: number,
-  h: number,
-  r: number,
-  color: string,
-  lineWidth: number,
-): void {
-  const x = cx - w / 2;
-  const y = cy - h / 2;
-  ctx.beginPath();
-  ctx.roundRect(x, y, w, h, r);
-  ctx.strokeStyle = color;
-  ctx.lineWidth = lineWidth;
-  ctx.stroke();
+interface GaugeProps {
+  value: number;
+  min: number;
+  max: number;
+  label: string;
+  displayValue: string;
+  minDisplay: number;
+  maxDisplay: number;
+  startAngle: number;
+  endAngle: number;
 }
 
-function drawDashedRoundedSquare(
-  ctx: CanvasRenderingContext2D,
-  cx: number,
-  cy: number,
-  w: number,
-  h: number,
-  r: number,
-  color: string,
-  lineWidth: number,
-): void {
-  const x = cx - w / 2;
-  const y = cy - h / 2;
-  ctx.beginPath();
-  ctx.setLineDash([3, 3]);
-  ctx.roundRect(x, y, w, h, r);
-  ctx.strokeStyle = color;
-  ctx.lineWidth = lineWidth;
-  ctx.stroke();
-  ctx.setLineDash([]);
-}
-
-function drawFilledRoundedSquare(
-  ctx: CanvasRenderingContext2D,
-  cx: number,
-  cy: number,
-  w: number,
-  h: number,
-  r: number,
-  color: string,
-): void {
-  const x = cx - w / 2;
-  const y = cy - h / 2;
-  ctx.beginPath();
-  ctx.roundRect(x, y, w, h, r);
-  ctx.fillStyle = color;
-  ctx.fill();
-}
-
-function roundedRectIndicatorState(
-  x: number,
-  y: number,
-  w: number,
-  h: number,
-  r: number,
-  t: number,
-): { point: { x: number; y: number }; normal: { x: number; y: number } } {
-  const clamped = clamp(t, 0, 1);
-  const x2 = x + w;
-  const y2 = y + h;
-  const straightV = Math.max(h - 2 * r, 0);
-  const straightH = Math.max(w - 2 * r, 0);
-  const arcLen = (Math.PI / 2) * r;
-
-  const seg1 = arcLen;
-  const seg2 = straightV;
-  const seg3 = arcLen;
-  const seg4 = straightH;
-  const seg5 = arcLen;
-  const seg6 = straightV;
-  const seg7 = arcLen;
-  const totalLen = seg1 + seg2 + seg3 + seg4 + seg5 + seg6 + seg7;
-  let distance = clamped * totalLen;
-
-  if (distance <= seg1) {
-    const theta = Math.PI / 2 + distance / r;
-    const centerX = x + r;
-    const centerY = y2 - r;
-    const pointX = centerX + r * Math.cos(theta);
-    const pointY = centerY + r * Math.sin(theta);
-    return {
-      point: { x: pointX, y: pointY },
-      normal: { x: -Math.cos(theta), y: -Math.sin(theta) },
-    };
-  }
-  distance -= seg1;
-
-  if (distance <= seg2) {
-    return { point: { x, y: y2 - r - distance }, normal: { x: 1, y: 0 } };
-  }
-  distance -= seg2;
-
-  if (distance <= seg3) {
-    const theta = Math.PI + distance / r;
-    const centerX = x + r;
-    const centerY = y + r;
-    const pointX = centerX + r * Math.cos(theta);
-    const pointY = centerY + r * Math.sin(theta);
-    return {
-      point: { x: pointX, y: pointY },
-      normal: { x: -Math.cos(theta), y: -Math.sin(theta) },
-    };
-  }
-  distance -= seg3;
-
-  if (distance <= seg4) {
-    return { point: { x: x + r + distance, y }, normal: { x: 0, y: 1 } };
-  }
-  distance -= seg4;
-
-  if (distance <= seg5) {
-    const theta = -Math.PI / 2 + distance / r;
-    const centerX = x2 - r;
-    const centerY = y + r;
-    const pointX = centerX + r * Math.cos(theta);
-    const pointY = centerY + r * Math.sin(theta);
-    return {
-      point: { x: pointX, y: pointY },
-      normal: { x: -Math.cos(theta), y: -Math.sin(theta) },
-    };
-  }
-  distance -= seg5;
-
-  if (distance <= seg6) {
-    return { point: { x: x2, y: y + r + distance }, normal: { x: -1, y: 0 } };
-  }
-  distance -= seg6;
-
-  const theta = distance / r;
-  const centerX = x2 - r;
-  const centerY = y2 - r;
-  const pointX = centerX + r * Math.cos(theta);
-  const pointY = centerY + r * Math.sin(theta);
-  return { point: { x: pointX, y: pointY }, normal: { x: -Math.cos(theta), y: -Math.sin(theta) } };
-}
-
-function CapsuleGauge({
-  progressValue,
+function Gauge({
+  value,
+  min,
+  max,
+  label,
   displayValue,
-  displayDigits = 0,
-  maxLabel,
-  minLabel,
-  centerLabel,
-  unit,
-}: {
-  progressValue: number;
-  displayValue: number;
-  displayDigits?: number;
-  maxLabel: string;
-  minLabel: string;
-  centerLabel: string;
-  unit: string;
-}): ReactElement {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const normalizedProgress = clamp(progressValue, 0, 100);
+  minDisplay,
+  maxDisplay,
+  startAngle,
+  endAngle,
+}: GaugeProps): ReactElement {
+  const clampedValue = clamp(value, min, max);
+  const span = max - min;
+  const normalizedValue = span <= 0 ? 0 : Math.min(Math.max((clampedValue - min) / span, 0), 1);
+  const rawSweepDegrees = (((endAngle - startAngle) % 360) + 360) % 360;
+  const sweepDegrees = rawSweepDegrees === 0 ? 360 : rawSweepDegrees;
+  const fillDegrees = normalizedValue * sweepDegrees;
+  const sweepPercent = (sweepDegrees / 360) * 100;
+  const fillPercent = (fillDegrees / 360) * 100;
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (canvas == undefined) {
-      return;
+  // CSS conic angles are measured clockwise from top (12 o'clock), so convert to
+  // math angle space before computing a moving radial hotspot.
+  const midAngleCss = (startAngle + fillDegrees / 2) % 360;
+  const midAngleRadians = ((midAngleCss - 90) * Math.PI) / 180;
+  const hotspotRadius = 22;
+  const hotspotX = 50 + Math.cos(midAngleRadians) * hotspotRadius;
+  const hotspotY = 50 + Math.sin(midAngleRadians) * hotspotRadius;
+
+  // Determine color based on percentage
+  const getColor = (): string => {
+    if (normalizedValue < 0.7) {
+      return "rgba(123, 212, 211, 0.6)";
     }
-
-    const context = canvas.getContext("2d");
-    if (context == undefined) {
-      return;
+    if (normalizedValue < 0.9) {
+      return "rgba(255, 255, 255, 0.6)";
     }
+    return "rgba(255, 0, 0, 0.6)";
+  };
 
-    const draw = (): void => {
-      const rect = canvas.getBoundingClientRect();
-      const size = Math.floor(Math.min(rect.width, rect.height));
-
-      if (size <= 0) {
-        return;
-      }
-
-      const dpr = window.devicePixelRatio;
-      const scale = Number.isFinite(dpr) && dpr > 0 ? dpr : 1;
-      canvas.width = Math.floor(size * scale);
-      canvas.height = Math.floor(size * scale);
-      context.setTransform(scale, 0, 0, scale, 0, 0);
-      context.clearRect(0, 0, size, size);
-
-      const cx = size / 2;
-      const cy = size / 2;
-      const outerR = size * 0.46;
-      const trackRadius = outerR * 0.33;
-      const trackSize = outerR * 2;
-      const trackX = cx - trackSize / 2;
-      const trackY = cy - trackSize / 2;
-
-      const speedFraction = clamp(normalizedProgress / 100, 0, 1);
-
-      drawRoundedSquare(
-        context,
-        cx,
-        cy,
-        trackSize,
-        trackSize,
-        trackRadius,
-        "rgba(80,80,80,0.35)",
-        1.5,
-      );
-
-      drawDashedRoundedSquare(
-        context,
-        cx,
-        cy,
-        outerR * 1.55,
-        outerR * 1.55,
-        outerR * 0.263,
-        "rgba(55,55,55,0.5)",
-        1,
-      );
-
-      const innerSize = outerR * 1.1;
-      drawFilledRoundedSquare(
-        context,
-        cx,
-        cy,
-        innerSize * 2,
-        innerSize * 2,
-        outerR * 0.217,
-        "rgba(17,17,17,0.3)",
-      );
-      drawRoundedSquare(
-        context,
-        cx,
-        cy,
-        innerSize * 2,
-        innerSize * 2,
-        outerR * 0.217,
-        "rgba(70,70,70,0.4)",
-        1,
-      );
-
-      const coreSize = outerR * 0.77;
-      drawFilledRoundedSquare(
-        context,
-        cx,
-        cy,
-        coreSize * 2,
-        coreSize * 2,
-        outerR * 0.171,
-        "rgba(13,13,13,0.9)",
-      );
-      drawRoundedSquare(
-        context,
-        cx,
-        cy,
-        coreSize * 2,
-        coreSize * 2,
-        outerR * 0.171,
-        "rgba(55,55,55,0.35)",
-        1,
-      );
-
-      if (speedFraction > 0) {
-        const indicator = roundedRectIndicatorState(
-          trackX,
-          trackY,
-          trackSize,
-          trackSize,
-          trackRadius,
-          speedFraction,
-        );
-        const lineHalf = outerR * 0.15;
-        const x1 = indicator.point.x - indicator.normal.x * lineHalf;
-        const y1 = indicator.point.y - indicator.normal.y * lineHalf;
-        const x2 = indicator.point.x + indicator.normal.x * lineHalf;
-        const y2 = indicator.point.y + indicator.normal.y * lineHalf;
-
-        context.save();
-        context.strokeStyle = "rgba(77, 184, 164, 0.95)";
-        context.lineWidth = Math.max(2, outerR * 0.035);
-        context.lineCap = "round";
-        context.shadowBlur = outerR * 0.2;
-        context.shadowColor = "rgba(77, 184, 164, 0.65)";
-        context.beginPath();
-        context.moveTo(x1, y1);
-        context.lineTo(x2, y2);
-        context.stroke();
-        context.restore();
-      }
-    };
-
-    draw();
-
-    if (typeof ResizeObserver === "undefined") {
-      return;
+  const getFillColor = (): string => {
+    if (normalizedValue < 0.7) {
+      return "rgba(123, 212, 211, 0.24)";
     }
-
-    const observer = new ResizeObserver(() => {
-      draw();
-    });
-    observer.observe(canvas);
-
-    return () => {
-      observer.disconnect();
-    };
-  }, [normalizedProgress]);
+    if (normalizedValue < 0.9) {
+      return "rgba(255, 255, 255, 0.2)";
+    }
+    return "rgba(255, 0, 0, 0.22)";
+  };
 
   return (
-    <div className="relative aspect-square w-full rounded-[2.6rem] border border-border/70 bg-background/40 p-4 backdrop-blur-sm">
-      <div className="absolute inset-0 p-2.5">
-        <canvas ref={canvasRef} className="h-full w-full" />
-      </div>
+    <div className="mx-auto flex h-auto w-full max-w-105 min-w-0 items-center justify-center">
+      <div className="relative flex aspect-square w-full items-center justify-center rounded-[100px] bg-linear-to-b from-teal-300/5 to-transparent">
+        <div className="absolute left-1/2 top-1/2 z-0 h-px w-full -translate-x-1/2 -translate-y-1/2 bg-linear-to-r from-zinc-700 via-black to-zinc-700" />
+        <div className="absolute left-1/2 top-0 z-0 h-1/2 w-px -translate-x-1/2 bg-linear-to-b to-black from-zinc-700" />
 
-      <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <div className="text-6xl font-semibold leading-none tracking-tight">
-          {displayValue.toFixed(displayDigits)}
+        <div className="absolute left-7.5 top-7.5 z-1 h-px w-32 origin-top-left rotate-45 bg-linear-to-r from-zinc-700" />
+        <div className="absolute right-7.5 top-7.5 z-20 h-px w-32 origin-top-right -rotate-45 bg-linear-to-r to-zinc-700" />
+        <div className="absolute bottom-7.5 left-7.5 z-20 h-px w-32 origin-bottom-left -rotate-45 bg-linear-to-r from-zinc-700" />
+        <div className="absolute bottom-7.5 right-7.5 z-20 h-px w-32 origin-bottom-right rotate-45 bg-linear-to-r to-zinc-700" />
+
+        <div
+          className="relative flex h-full w-full items-center justify-center rounded-[100px] border-[1.5px] border-b-border border-zinc-700 transition-all duration-500 ease-in-out"
+          style={{
+            background: `conic-gradient(from ${startAngle}deg, ${getColor()} 0% ${fillPercent}%, rgba(255, 255, 255, 0.08) ${fillPercent}% ${sweepPercent}%, transparent ${sweepPercent}% 100%), conic-gradient(from ${startAngle}deg, ${getFillColor()} 0% ${fillPercent}%, transparent ${fillPercent}% 100%), radial-gradient(circle at ${hotspotX}% ${hotspotY}%, rgba(123, 212, 211, ${normalizedValue > 0 ? 0.25 : 0}) 0%, rgba(123, 212, 211, 0) 38%)`,
+          }}
+        >
+          <div className="absolute left-0 top-0 text-[20px] leading-[77%] text-zinc-500 rotate-315">
+            {Math.round(maxDisplay / 3)}
+          </div>
+          <div className="absolute right-0 top-0 text-[20px] leading-[77%] text-zinc-500 rotate-45">
+            {Math.round((maxDisplay / 3) * 2)}
+          </div>
+          <div className="absolute bottom-0 right-0 text-[20px] leading-[77%] text-zinc-500 rotate-315">
+            {maxDisplay}
+          </div>
+          <div className="absolute bottom-0 left-0 text-[20px] leading-[77%] text-zinc-500 rotate-45">
+            {minDisplay}
+          </div>
+
+          <div className="absolute z-0 aspect-square w-[75%] rounded-[80px] border-r border-l border-t border-b-none border-zinc-600 bg-black/10 backdrop-blur-[20px] " />
+
+          <div className="absolute z-10 aspect-square w-[50%] rounded-[50px] border-[1.5px] border-teal-500  bg-black/30 backdrop-blur-[100px]" />
+
+          <div className="absolute z-20 flex flex-col items-center justify-center gap-4">
+            <h2 className="text-[50px] font-light leading-[77%] tracking-[0.04em]">
+              {displayValue}
+            </h2>
+            <p className="text-sm font-light uppercase tracking-[0.3em] text-zinc-500">{label}</p>
+          </div>
         </div>
-        <div className="mt-2 text-2xl font-medium text-muted-foreground">{unit}</div>
-      </div>
-
-      <div className="absolute left-6 top-5 text-4xl font-medium text-muted-foreground/80">
-        {maxLabel}
-      </div>
-      <div className="absolute right-6 top-5 text-4xl font-medium text-muted-foreground/80">
-        {minLabel}
-      </div>
-      <div className="absolute bottom-5 left-6 text-4xl font-medium text-muted-foreground/80">
-        {centerLabel}
       </div>
     </div>
   );
@@ -479,12 +252,12 @@ export function Cluster({
 }: ClusterProps): ReactElement {
   const speedMs = steeringAndSpeed?.vehicle_velocity_measured;
   const speedKmh = speedMs == undefined ? undefined : speedMs * 3.6;
+  const speedKmhGauge = clamp(speedKmh ?? 0, 0, 40);
   const requestedMs =
     steeringAndSpeed?.vehicle_velocity_requested ?? remoteDriveRequest?.remote_velocity_req;
 
   const throttlePercent = toPercent(scaledSignals?.throttle_signal);
   const brakePercent = toPercent(scaledSignals?.brake_signal);
-  const speedPercent = clamp(((speedKmh ?? 0) / 40) * 100, 0, 100);
 
   const batteryVoltage = batteryStatus?.battery_voltage;
   const batteryCurrent = batteryStatus?.battery_current;
@@ -492,7 +265,7 @@ export function Cluster({
     batteryVoltage == undefined || batteryCurrent == undefined
       ? undefined
       : Math.abs((batteryVoltage * batteryCurrent) / 1000);
-  const powerPercent = powerKw == undefined ? 0 : clamp((powerKw / 20) * 100, 0, 100);
+  const powerKwGauge = clamp(powerKw ?? 0, 0, 100);
   const coolantLikeTemp = temperatures?.curtis_controller_temp;
 
   const proximityCm = nearestDistance(usSensorFront, usSensorRear);
@@ -522,13 +295,8 @@ export function Cluster({
     <div className="h-full w-full max-w-full overflow-hidden p-3 lg:p-4">
       <Card className="h-full overflow-hidden border-border/60 bg-background/90">
         <CardContent className="flex h-full flex-col px-4 py-4 lg:px-6 lg:py-5">
-          <div className="mb-4 grid items-start gap-3 lg:grid-cols-3">
+          <div className="mb-4 grid grid-cols-2 items-start gap-3">
             <HeaderMetric label="Mode" value={`${generalVehicleStatus?.active_op_mode ?? "--"}`} />
-            <TopProgress
-              left={`${format(steeringMeasured, 0)}°`}
-              right={`${format(steeringRequested, 0)}°`}
-              center={`${format(coolantLikeTemp, 0)}°`}
-            />
             <div className="flex items-center justify-end gap-4">
               <HeaderMetric
                 label="Ambient"
@@ -538,16 +306,18 @@ export function Cluster({
             </div>
           </div>
 
-          <div className="grid min-h-0 flex-1 gap-4 lg:grid-cols-12 lg:gap-5">
-            <div className="min-h-0 lg:col-span-3">
-              <CapsuleGauge
-                progressValue={powerPercent}
-                displayValue={powerKw ?? 0}
-                displayDigits={1}
-                maxLabel="20"
-                minLabel="0"
-                centerLabel="10"
-                unit="kWh"
+          <div className="grid min-h-0 flex-1 grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)] gap-3 xl:grid-cols-[minmax(14rem,26.25rem)_minmax(0,1fr)_minmax(14rem,26.25rem)] xl:gap-5">
+            <div className="min-h-0 min-w-0">
+              <Gauge
+                value={powerKwGauge}
+                min={0}
+                max={100}
+                label="kW"
+                displayValue={format(powerKwGauge, 1)}
+                minDisplay={0}
+                maxDisplay={100}
+                startAngle={225}
+                endAngle={135}
               />
               <div className="mt-4 rounded-full border border-border/70 bg-card/70 px-4 py-2 text-sm font-medium">
                 <div className="grid grid-cols-3 gap-2 text-center">
@@ -556,71 +326,164 @@ export function Cluster({
                   <span className="text-muted-foreground">{format(proximityCm, 0)}cm</span>
                 </div>
               </div>
+
+              <div className="mt-4 max-w-[18rem]">
+                <TopProgress
+                  left={`${format(steeringMeasured, 0)}°`}
+                  right={`${format(steeringRequested, 0)}°`}
+                  center={`${format(coolantLikeTemp, 0)}°`}
+                />
+              </div>
             </div>
 
-            <div className="min-h-0 lg:col-span-6 rounded-3xl border border-border/60 bg-card/40 p-4 backdrop-blur-sm">
-              <div className="flex items-center justify-center gap-2 text-xs uppercase tracking-[0.2em] text-muted-foreground">
-                <span>Vehicle Stage</span>
-                <span>·</span>
-                <span>{format(requestedMs, 2)} m/s req</span>
+            <div className="min-h-0 min-w-0">
+              <div className="mx-auto w-full max-w-105 min-w-0">
+                <div className="relative flex min-h-0 w-full flex-col overflow-hidden rounded-3xl border border-border/60 bg-card/40 p-4 backdrop-blur-sm">
+                  <div className="pointer-events-none absolute inset-0">
+                    <div
+                      className="relative h-full w-full overflow-hidden rounded-lg"
+                      style={{
+                        background: `
+                        linear-gradient(135deg, rgba(123, 212, 211, 0.1) 0%, rgba(20, 25, 30, 0.9) 100%),
+                        repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.03) 0px, rgba(255, 255, 255, 0.03) 1px, transparent 1px, transparent 20px),
+                        repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.03) 0px, rgba(255, 255, 255, 0.03) 1px, transparent 1px, transparent 20px),
+                        radial-gradient(circle at 30% 40%, rgba(123, 212, 211, 0.15) 0%, transparent 50%),
+                        #0a0f14
+                      `,
+                      }}
+                    >
+                      <svg
+                        className="h-full w-full opacity-20"
+                        viewBox="0 0 320 208"
+                        preserveAspectRatio="none"
+                      >
+                        <line
+                          x1="0"
+                          y1="80"
+                          x2="320"
+                          y2="80"
+                          stroke="rgba(255,255,255,0.3)"
+                          strokeWidth="2"
+                        />
+                        <line
+                          x1="0"
+                          y1="128"
+                          x2="320"
+                          y2="128"
+                          stroke="rgba(255,255,255,0.3)"
+                          strokeWidth="2"
+                        />
+                        <line
+                          x1="100"
+                          y1="0"
+                          x2="100"
+                          y2="208"
+                          stroke="rgba(255,255,255,0.3)"
+                          strokeWidth="2"
+                        />
+                        <line
+                          x1="220"
+                          y1="0"
+                          x2="220"
+                          y2="208"
+                          stroke="rgba(255,255,255,0.3)"
+                          strokeWidth="2"
+                        />
+                        <line
+                          x1="0"
+                          y1="0"
+                          x2="120"
+                          y2="208"
+                          stroke="rgba(123,212,211,0.2)"
+                          strokeWidth="1.5"
+                          strokeDasharray="5,5"
+                        />
+                        <line
+                          x1="200"
+                          y1="0"
+                          x2="320"
+                          y2="208"
+                          stroke="rgba(123,212,211,0.2)"
+                          strokeWidth="1.5"
+                          strokeDasharray="5,5"
+                        />
+                      </svg>
+
+                      <div className="absolute right-4 top-4">
+                        <NavigationIcon
+                          className="h-6 w-6 text-teal-400"
+                          fill="rgba(123, 212, 211, 0.3)"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="relative z-10 flex min-h-0 flex-1 flex-col items-center">
+                    <div className="flex items-center justify-center gap-2 text-center text-xs uppercase tracking-[0.2em] text-muted-foreground">
+                      <span>Vehicle Stage</span>
+                      <span>·</span>
+                      <span>{format(requestedMs, 2)} m/s req</span>
+                    </div>
+
+                    <div className="relative mt-3 h-[clamp(160px,34vh,460px)] w-full max-w-104 shrink-0 self-center">
+                      <div className="absolute inset-x-0 top-1/2 h-20 -translate-y-1/2 rounded-full bg-primary/10 blur-3xl sm:h-24" />
+
+                      <div className="absolute left-2 top-1/2 z-10 flex -translate-y-1/2 flex-col gap-2">
+                        <IndicatorIconBadge
+                          active={turnIndicators.left || hazardOn}
+                          title="Left blinker"
+                          icon={<TriangleIcon className="h-4 w-4 -rotate-90" />}
+                        />
+                        <IndicatorIconBadge
+                          active={lightOn}
+                          title="Lights"
+                          icon={<LightbulbIcon className="h-4 w-4" />}
+                        />
+                        <IndicatorIconBadge
+                          active={hornOn}
+                          title="Horn"
+                          icon={<BellIcon className="h-4 w-4" />}
+                        />
+                      </div>
+
+                      <div className="absolute right-2 top-1/2 z-10 flex -translate-y-1/2 flex-col gap-2">
+                        <IndicatorIconBadge
+                          active={turnIndicators.right || hazardOn}
+                          title="Right blinker"
+                          icon={<TriangleIcon className="h-4 w-4 rotate-90" />}
+                        />
+                        <IndicatorIconBadge
+                          active={reverseOn}
+                          title="Reverse"
+                          icon={<RotateCcwIcon className="h-4 w-4" />}
+                        />
+                        <IndicatorIconBadge
+                          active={estopOn}
+                          destructive
+                          title="E-stop"
+                          icon={
+                            estopOn ? (
+                              <TriangleAlertIcon className="h-4 w-4" />
+                            ) : (
+                              <CirclePowerIcon className="h-4 w-4" />
+                            )
+                          }
+                        />
+                      </div>
+
+                      <div className="relative flex h-full items-center justify-center overflow-hidden px-4 py-2 sm:px-6">
+                        <img
+                          src={nina005}
+                          alt="Nina005 car"
+                          className="mx-auto h-auto w-[56%] max-h-[82%] max-w-[16.666vw] object-contain sm:w-[60%] lg:w-[66%]"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              <div className="relative mt-3 h-[clamp(220px,36vh,420px)]">
-                <div className="absolute inset-x-0 top-1/2 h-24 -translate-y-1/2 rounded-full bg-primary/10 blur-3xl" />
-
-                <div className="absolute left-2 top-1/2 z-10 flex -translate-y-1/2 flex-col gap-2">
-                  <IndicatorIconBadge
-                    active={turnIndicators.left || hazardOn}
-                    title="Left blinker"
-                    icon={<TriangleIcon className="h-4 w-4 -rotate-90" />}
-                  />
-                  <IndicatorIconBadge
-                    active={lightOn}
-                    title="Lights"
-                    icon={<LightbulbIcon className="h-4 w-4" />}
-                  />
-                  <IndicatorIconBadge
-                    active={hornOn}
-                    title="Horn"
-                    icon={<BellIcon className="h-4 w-4" />}
-                  />
-                </div>
-
-                <div className="absolute right-2 top-1/2 z-10 flex -translate-y-1/2 flex-col gap-2">
-                  <IndicatorIconBadge
-                    active={turnIndicators.right || hazardOn}
-                    title="Right blinker"
-                    icon={<TriangleIcon className="h-4 w-4 rotate-90" />}
-                  />
-                  <IndicatorIconBadge
-                    active={reverseOn}
-                    title="Reverse"
-                    icon={<RotateCcwIcon className="h-4 w-4" />}
-                  />
-                  <IndicatorIconBadge
-                    active={estopOn}
-                    destructive
-                    title="E-stop"
-                    icon={
-                      estopOn ? (
-                        <TriangleAlertIcon className="h-4 w-4" />
-                      ) : (
-                        <CirclePowerIcon className="h-4 w-4" />
-                      )
-                    }
-                  />
-                </div>
-
-                <div className="relative flex h-full items-center justify-center">
-                  <img
-                    src={nina005}
-                    alt="Nina005 car"
-                    className="mx-auto h-auto max-h-full w-full max-w-130 object-contain"
-                  />
-                </div>
-              </div>
-
-              <div className="mt-4 grid grid-cols-3 gap-3 rounded-2xl border border-border/60 bg-background/70 p-3 text-center">
+              <div className="mt-4 mx-auto grid w-full max-w-105 grid-cols-3 gap-3 rounded-2xl border border-border/60 bg-background/70 p-3 text-center">
                 <div className="flex items-center gap-3">
                   <div className="relative h-14 w-2 overflow-hidden rounded-full bg-muted/70">
                     <div
@@ -652,14 +515,17 @@ export function Cluster({
               </div>
             </div>
 
-            <div className="min-h-0 lg:col-span-3">
-              <CapsuleGauge
-                progressValue={speedPercent}
-                displayValue={speedKmh ?? 0}
-                maxLabel="40"
-                minLabel="0"
-                centerLabel="20"
-                unit="km/h"
+            <div className="min-h-0 min-w-0">
+              <Gauge
+                value={speedKmhGauge}
+                min={0}
+                max={40}
+                label="km/h"
+                displayValue={format(speedKmhGauge, 0)}
+                minDisplay={0}
+                maxDisplay={40}
+                startAngle={225}
+                endAngle={135}
               />
               <div className="mt-4 rounded-full border border-border/70 bg-card/70 px-4 py-2 text-sm font-medium">
                 <div className="grid grid-cols-3 gap-2 text-center">

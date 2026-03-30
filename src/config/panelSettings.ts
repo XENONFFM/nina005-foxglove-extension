@@ -47,6 +47,18 @@ export function buildSettingsTree(settings: PanelSettings): SettingsTreeNodes {
         },
       },
     },
+    testing: {
+      label: "Testing",
+      icon: "Settings",
+      fields: {
+        autoRefreshValues: {
+          label: "Auto Refresh Values",
+          input: "boolean",
+          value: settings.testing.autoRefreshValues,
+          help: "Automatically randomize mock values every second.",
+        },
+      },
+    },
     parkSensors: {
       label: "Park Sensors",
       icon: "Settings",
