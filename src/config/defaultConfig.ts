@@ -5,6 +5,7 @@ import { PanelSettings, PanelTab } from "./types";
 const PANEL_TABS: readonly PanelTab[] = [
   "cluster",
   "dashboard",
+  "modular",
   "drivetrain",
   "signals",
   "status",
@@ -27,7 +28,7 @@ export const DEFAULT_PANEL_SETTINGS: PanelSettings = {
 };
 
 function asRecord(value: unknown): Record<string, unknown> | undefined {
-  if (value && typeof value === "object") {
+  if (value != undefined && typeof value === "object") {
     return value as Record<string, unknown>;
   }
   return undefined;
@@ -66,7 +67,7 @@ export function resolvePanelSettings(...sources: Array<unknown>): PanelSettings 
     const parkSensors = asRecord(root.parkSensors);
 
     const defaultTab = asPanelTab(tabs?.defaultTab);
-    if (defaultTab) {
+    if (defaultTab != undefined) {
       resolved.tabs.defaultTab = defaultTab;
     }
 

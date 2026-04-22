@@ -24,6 +24,7 @@ import {
 } from "@/schemas";
 import { Cluster } from "@/views/Cluster";
 import { Dashboard } from "@/views/Dashboard";
+import { Modular } from "@/views/Modular";
 import { Remote } from "@/views/Remote";
 import { Signals } from "@/views/Signals";
 import { Status } from "@/views/Status";
@@ -82,12 +83,17 @@ export function App({
   };
 
   return (
-    <Tabs value={currentTab} onValueChange={handleTabChange} className="flex-col w-full">
+    <Tabs
+      value={currentTab}
+      onValueChange={handleTabChange}
+      className="flex-col w-full h-full gap-0"
+    >
       {showMenuBar && (
-        <div className="w-full my-4 flex justify-center">
-          <TabsList className="w-fit" variant="default">
+        <div className="mt-4 flex w-full justify-center px-2">
+          <TabsList variant="default">
             <TabsTrigger value="cluster">Cluster</TabsTrigger>
             <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+            <TabsTrigger value="modular">Modular</TabsTrigger>
             <TabsTrigger value="drivetrain">Drivetrain</TabsTrigger>
             <TabsTrigger value="signals">Signals</TabsTrigger>
             <TabsTrigger value="status">Status</TabsTrigger>
@@ -131,6 +137,31 @@ export function App({
             usSensorFront={data.usSensorFront}
             usSensorRear={data.usSensorRear}
             remoteDriveRequest={data.remoteDriveRequest}
+          />
+        </div>
+      </TabsContent>
+      <TabsContent value="modular" className="w-full h-full min-h-0 overflow-hidden">
+        <div className="flex h-full min-h-0 w-full max-w-none overflow-hidden">
+          <Modular
+            applicationStatus={data.applicationStatus}
+            batteryStatus={data.batteryStatus}
+            generalVehicleStatus={data.generalVehicleStatus}
+            scaledSignals={data.scaledSignals}
+            steeringAndSpeed={data.steeringAndSpeed}
+            temperatures={data.temperatures}
+            rawSignalBrake={data.rawSignalBrake}
+            rawSignalThrottle={data.rawSignalThrottle}
+            rawSignalSteeringPosition={data.rawSignalSteeringPosition}
+            rawSignalSteeringForce={data.rawSignalSteeringForce}
+            rawSignalSteeringVelocity={data.rawSignalSteeringVelocity}
+            rawSignalSteeringVelocityCmd={data.rawSignalSteeringVelocityCmd}
+            rawSignalThrottlePotiCmd={data.rawSignalThrottlePotiCmd}
+            rawSignalVehicleSpeed={data.rawSignalVehicleSpeed}
+            usSensorFront={data.usSensorFront}
+            usSensorRear={data.usSensorRear}
+            remoteDriveRequest={data.remoteDriveRequest}
+            remoteIndicatorRequest={data.remoteIndicatorRequest}
+            remoteApplicationToggleRequest={data.remoteApplicationToggleRequest}
           />
         </div>
       </TabsContent>

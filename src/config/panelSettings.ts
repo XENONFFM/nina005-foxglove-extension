@@ -2,17 +2,50 @@ import { SettingsTreeAction, SettingsTreeNodes } from "@foxglove/extension";
 import { produce } from "immer";
 import { set } from "lodash";
 
+import { createDefaultPanelSettings } from "./defaultConfig";
 import { PanelSettings, PanelTabOption } from "./types";
 
 export const TAB_OPTIONS: PanelTabOption[] = [
   { value: "cluster", label: "Cluster" },
   { value: "dashboard", label: "Dashboard" },
+  { value: "modular", label: "Modular" },
   { value: "drivetrain", label: "Drivetrain" },
   { value: "signals", label: "Signals" },
   { value: "status", label: "Status" },
   { value: "remote", label: "Remote" },
   { value: "parking", label: "Park sensors" },
 ];
+
+const ROOT_SETTING_KEYS = new Set(Object.keys(createDefaultPanelSettings()));
+
+function resolveSettingsPath(path: readonly string[]): string {
+  if (path.length === 0) {
+    return "";
+  }
+
+  const dottedSegmentIndex = path.findIndex((segment) => segment.includes("."));
+  if (dottedSegmentIndex >= 0) {
+    const segments = path.slice(dottedSegmentIndex).join(".").split(".").filter(Boolean);
+
+    // Handles paths like ["tabs", "tabs.defaultTab"] from nested settings UIs.
+    if (
+      segments.length >= 2 &&
+      segments[0] === segments[1] &&
+      ROOT_SETTING_KEYS.has(segments[0] ?? "")
+    ) {
+      segments.shift();
+    }
+
+    return segments.join(".");
+  }
+
+  const segments = [...path];
+  while (segments.length > 1 && !ROOT_SETTING_KEYS.has(segments[0] ?? "")) {
+    segments.shift();
+  }
+
+  return segments.join(".");
+}
 
 export function settingsActionReducer(
   prevSettings: PanelSettings,
@@ -24,7 +57,7 @@ export function settingsActionReducer(
     }
 
     const { path, value } = action.payload;
-    set(draft, path.join("."), value);
+    set(draft, resolveSettingsPath(path), value);
   });
 }
 
@@ -32,7 +65,7 @@ export function buildSettingsTree(settings: PanelSettings): SettingsTreeNodes {
   return {
     tabs: {
       label: "Tabs",
-      icon: "Settings",
+      icon: "",
       fields: {
         defaultTab: {
           label: "Default Tab",

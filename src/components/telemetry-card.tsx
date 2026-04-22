@@ -119,11 +119,11 @@ export function TelemetryCard<TMessage extends Record<string, unknown>>({
     }) ?? inferredEntries;
 
   return (
-    <Card>
+    <Card className="h-full min-h-0 overflow-hidden bg-card/80 backdrop-blur-sm ring-0 border">
       <CardHeader>
         <CardTitle className="text-base">{title}</CardTitle>
       </CardHeader>
-      <CardContent className="text-sm">
+      <CardContent className="min-h-0 overflow-hidden text-sm">
         <div className={`grid gap-3 ${columns === 2 ? "grid-cols-2" : "grid-cols-1"}`}>
           {fieldEntries.map((entry) => (
             <div key={entry.key} className="flex items-center justify-between gap-2">

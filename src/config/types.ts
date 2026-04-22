@@ -1,6 +1,7 @@
 export type PanelTab =
   | "cluster"
   | "dashboard"
+  | "modular"
   | "drivetrain"
   | "signals"
   | "status"
