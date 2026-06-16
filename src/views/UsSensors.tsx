@@ -1,15 +1,14 @@
 "use client";
 
-import React from "react";
+import { type ReactElement } from "react";
 
 import {
   ParkSensorDisplay,
   type ParkSensorData,
-} from "../components/park-sensor/park-sensor-display";
-import { SensorControls } from "../components/park-sensor/sensor-controls";
-import { USSensorFront, USSensorRear } from "../schemas";
-
+} from "@/components/park-sensor/park-sensor-display";
+import { SensorControls } from "@/components/park-sensor/sensor-controls";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { USSensorFront, USSensorRear } from "@/schemas";
 
 /**
  * Maps USSensorFront and USSensorRear ROS messages to ParkSensorData format
@@ -31,28 +30,34 @@ function mapSensorsToDisplay(front?: USSensorFront, rear?: USSensorRear): ParkSe
   };
 }
 
-interface ParkSensorPageProps {
+interface UsSensorsProps {
   usSensorFront?: USSensorFront;
   usSensorRear?: USSensorRear;
+  showDisplay?: boolean;
+  showControls?: boolean;
 }
 
-export default function ParkSensorPage({
+export function UsSensors({
   usSensorFront,
   usSensorRear,
-}: ParkSensorPageProps): JSX.Element {
+  showDisplay = true,
+  showControls = true,
+}: UsSensorsProps): ReactElement {
   const sensors = mapSensorsToDisplay(usSensorFront, usSensorRear);
 
   return (
     <main className="flex flex-row lg:flex-row items-center justify-center gap-10 p-6">
-      <ParkSensorDisplay sensors={sensors} width={480} height={680} />
-      <Card className="w-sm">
-        <CardHeader>
-          <h2 className="text-base font-semibold mb-5 tracking-wide">Ultrasonic Sensors</h2>
-        </CardHeader>
-        <CardContent>
-          <SensorControls sensors={sensors} />
-        </CardContent>
-      </Card>
+      {showDisplay && <ParkSensorDisplay sensors={sensors} width={480} height={680} />}
+      {showControls && (
+        <Card className="w-fit max-w-full min-w-xs">
+          <CardHeader>
+            <h2 className="text-base font-semibold mb-5 tracking-wide">Ultrasonic Sensors</h2>
+          </CardHeader>
+          <CardContent>
+            <SensorControls sensors={sensors} />
+          </CardContent>
+        </Card>
+      )}
     </main>
   );
 }

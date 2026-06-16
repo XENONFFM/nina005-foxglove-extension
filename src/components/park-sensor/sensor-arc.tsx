@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import { type ReactElement, type ReactNode } from "react";
 
 /**
  * Each sensor value is 0–8, representing how many of the 8 detection zones are active.
@@ -114,13 +114,11 @@ export function SensorArc({
   innerRadius,
   radiusStep,
   outward: _outward = true,
-}: SensorArcProps): JSX.Element {
+}: SensorArcProps): ReactElement {
   const clampedValue = Math.max(0, Math.min(8, Math.round(value)));
-  if (clampedValue === 0) {
-    return <g />;
-  }
+  const inactiveColor = "var(--inactive)";
 
-  const zones: React.ReactNode[] = [];
+  const zones: ReactNode[] = [];
   const gap = 2; // gap between concentric rings
 
   for (let i = 0; i < 8; i++) {
@@ -128,15 +126,21 @@ export function SensorArc({
     const rInner = innerRadius + i * radiusStep + gap / 2;
     const rOuter = innerRadius + (i + 1) * radiusStep - gap / 2;
 
-    const opacity = getZoneOpacity(i, clampedValue);
-    if (opacity <= 0) {
-      continue;
-    }
-
-    const color = getZoneColor(i);
+    const ringFromOuter = 7 - i;
+    const isActive = ringFromOuter < clampedValue;
+    const opacity = isActive ? getZoneOpacity(i, clampedValue) : 1;
+    const color = isActive ? getZoneColor(i) : inactiveColor;
     const path = describeArc(cx, cy, rInner, rOuter, startAngle, endAngle);
 
-    zones.push(<path key={i} d={path} fill={color} opacity={opacity} />);
+    zones.push(
+      <path
+        key={i}
+        d={path}
+        fill={color}
+        opacity={opacity}
+        filter={isActive ? "url(#sensorGlow)" : undefined}
+      />,
+    );
   }
 
   return <g>{zones}</g>;

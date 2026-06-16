@@ -1,9 +1,10 @@
 "use client";
 
-import React from "react";
+import { ReactElement } from "react";
 
 import { SensorArc } from "./sensor-arc";
-import nina005 from "../../assets/Nina005.png";
+
+import nina005 from "@/assets/Nina005.png";
 
 /**
  * ParkSensorData
@@ -127,7 +128,7 @@ export function ParkSensorDisplay({
   sensors,
   width = 600,
   height = 800,
-}: ParkSensorDisplayProps): JSX.Element {
+}: ParkSensorDisplayProps): ReactElement {
   const frontValues = [
     sensors.frontLeft,
     sensors.frontCenterLeft,
@@ -176,7 +177,7 @@ export function ParkSensorDisplay({
         </defs>
 
         {/* Front sensors behind the car */}
-        <g filter="url(#sensorGlow)">
+        <g>
           {FRONT_SENSORS.map((s, i) => (
             <SensorArc
               key={`front-${i}`}
@@ -193,7 +194,7 @@ export function ParkSensorDisplay({
         </g>
 
         {/* Rear sensors behind the car */}
-        <g filter="url(#sensorGlow)">
+        <g>
           {REAR_SENSORS.map((s, i) => (
             <SensorArc
               key={`rear-${i}`}

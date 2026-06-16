@@ -1,39 +1,90 @@
-# myExtensionName
+# ASLZ Nina005 Extension
 
-[Foxglove](https://foxglove.dev) allows developers to create [extensions](https://docs.foxglove.dev/docs/visualization/extensions/introduction), or custom code that is loaded and executed inside the Foxglove application. This can be used to add custom panels. Extensions are authored in TypeScript using the `@foxglove/extension` SDK.
+![https://github.com/Autonomous-System-ZHAW](https://img.shields.io/badge/ASLZ-Autonomous%20System%20Lab%20Zurich-grey?style=flat&labelColor=0000ff)
+[![Open in Dev Containers](https://img.shields.io/badge/DevContainers-Open-blue?style=flat&labelColor=grey)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/XENONFFM/nina005-foxglove-extension)
 
-## Develop
+A [Foxglove](https://foxglove.dev/) panel extension for visualizing Nina005 vehicle telemetry. It presents vehicle state, raw drivetrain signals, remote control requests, and ultrasonic parking sensors through dedicated tabs.
 
-Extension development uses the `npm` package manager to install development dependencies and run build scripts.
+| ![Nina005 Extension screenshot](docs/images/1.webp) | ![Nina005 Extension screenshot](docs/images/2.webp) |
+| :-------------------------------------------------: | :-------------------------------------------------: |
 
-To install extension dependencies, run `npm` from the root of the extension package.
+## Features
 
-```sh
-npm install
+### Data
+
+- Supports structured schemas from `src/schemas` (status, battery, drivetrain, remote, ultrasonic).
+- Separates high-level and raw diagnostics into dedicated views.
+
+### Views
+
+The panel exposes one active tab at a time. Each tab focuses on a specific data domain so operators can switch quickly between high-level status and low-level diagnostics.
+
+| View             | Description                                  |
+| ---------------- | -------------------------------------------- |
+| **Cluster**      | Driver Information Display                   |
+| **Dashboard**    | Aggregated telemetry                         |
+| **Drivetrain**   | Propulsion, steering, battery and other data |
+| **Signals**      | Raw control signal diagnostics               |
+| **Status**       | Application + general vehicle status         |
+| **Remote**       | Remote drive/indicator/app-toggle requests   |
+| **Park Sensors** | Front/rear ultrasonic sensor visualization   |
+
+### Settings
+
+All panel options are exposed in the Foxglove settings tree so they persist across sessions and can be managed from the Foxglove settings sidebar.
+
+## Installation
+
+### Release `.foxe` file
+
+Download the latest `.foxe` from the [Releases](https://github.com/XENONFFM/nina005-foxglove-extension/releases) page and drag-and-drop it onto Foxglove Studio (desktop or web).
+
+### Build from source
+
+```bash
+pnpm install
+pnpm run package   # produces a .foxe file
+pnpm run local-install  # build + install into local Foxglove desktop
 ```
 
-To build and install the extension into your local Foxglove desktop app, run:
+### Development in Dev Container
 
-```sh
-npm run local-install
+This repository supports VS Code Dev Containers for a consistent local environment.
+
+- Open the repo in VS Code and choose **Reopen in Container**.
+- The container includes the required toolchain for development (Node.js, pnpm, TypeScript, ESLint, and Git).
+- Run the same commands shown in this README inside the container terminal.
+
+### Dev harness (no Foxglove required)
+
+Iterate on the UI in a browser without launching Foxglove:
+
+```bash
+pnpm install
+pnpm run dev       # starts Vite at http://localhost:5173
 ```
 
-Open the Foxglove desktop (or `ctrl-R` to refresh if it is already open). Your extension is installed and available within the app.
+The harness renders the panel with a mocked Foxglove context, allowing you to test UI changes and settings in real-time.
 
-## Package
+**[→ Full Dev Harness Documentation](docs/DEV_HARNESS.md)**
 
-Extensions are packaged into `.foxe` files. These files contain the metadata (package.json) and the build code for the extension.
+## Architecture
 
-Before packaging, make sure to set `name`, `publisher`, `version`, and `description` fields in _package.json_. When ready to distribute the extension, run:
+W.I.P
 
-```sh
-npm run package
+## Project Structure
+
+```text
+dev/                  # Vite dev harness (no Foxglove required)
+	harness.tsx
+	main.tsx
+	mock-vehicle.ts
+src/
+	app.tsx           # React app
+    index.tsx         # Foxglove entry point
+	panel.tsx         # Foxglove panel
+	components/		  # Shared UI components
+	schemas/
+	styles/
+	views/
 ```
-
-This command will package the extension into a `.foxe` file in the local directory.
-
-## Publish
-
-You can publish the extension to the public registry or privately for your organization.
-
-See documentation here: https://docs.foxglove.dev/docs/visualization/extensions/publish/#packaging-your-extension

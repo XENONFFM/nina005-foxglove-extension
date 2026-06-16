@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -12,7 +13,7 @@
   --popover-foreground: oklch(0.145 0 0);
   --primary: oklch(0.205 0 0);
   --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
+  --secondary: oklch(0.985 0 0);
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
   --muted-foreground: oklch(0.556 0 0);
@@ -37,12 +38,16 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  /* Add more color variables as needed */
+  --inactive: oklch(0.985 0 0);
+  --card-number: oklch(0.985 0 0);
+  --placeholder: oklch(0.741 0 0);
 }
 
 .dark {
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
-  --card: oklch(0.145 0 0);
+  --card: oklch(0.205 0 0);
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.145 0 0);
   --popover-foreground: oklch(0.985 0 0);
@@ -72,6 +77,10 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(0.269 0 0);
   --sidebar-ring: oklch(0.439 0 0);
+  /* Add more color variables as needed */
+  --inactive: oklch(0.1822 0 0);
+  --card-number: oklch(0.0823 0 0);
+  --placeholder: oklch(0.741 0 0);
 }
 
 @theme inline {
@@ -111,6 +120,10 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  /* Add more color variables as needed */
+  --color-inactive: var(--inactive);
+  --color-placeholder: var(--placeholder);
+  --color-card-number: var(--card-number);
 }
 
 @layer base {
@@ -119,5 +132,149 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+  html,
+  body {
+    height: 100%;
+    width: 100%;
+  }
+}
+
+@layer components {
+  .modular-mobile-scroll {
+    overflow-x: hidden;
+    overflow-y: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .modular-mobile-scroll::-webkit-scrollbar {
+    display: none;
+  }
+
+  .modular-grid .react-grid-item {
+    z-index: 1;
+    border-radius: calc(var(--radius) + 4px);
+    transition:
+      transform 160ms ease,
+      width 160ms ease,
+      height 160ms ease,
+      box-shadow 160ms ease;
+  }
+
+  .modular-grid .react-grid-item.react-draggable-dragging,
+  .modular-grid .react-grid-item.resizing {
+    z-index: 20;
+    /* box-shadow:
+      0 0 0 1px color-mix(in oklab, var(--ring) 55%, transparent),
+      0 14px 36px color-mix(in oklab, var(--foreground) 18%, transparent); */
+  }
+
+  .modular-grid .react-grid-placeholder,
+  .modular-grid .react-grid-item.react-grid-placeholder {
+    z-index: 0 !important;
+    pointer-events: none;
+    border-radius: calc(var(--radius) + 4px);
+    border: 2px solid var(--placeholder) !important;
+    /* background: var(--muted) !important; */
+    background: var(--muted) !important;
+    box-shadow: inset 0 1px 4px var(--placeholder);
+    opacity: 1 !important;
+  }
+
+  .dark .modular-grid .react-grid-placeholder,
+  .dark .modular-grid .react-grid-item.react-grid-placeholder {
+    box-shadow: inset 0 1px 4px rgb(255 255 255 / 0.08);
+  }
+
+  .modular-grid .modular-grid-handle {
+    height: 0.9rem;
+    width: 0.9rem;
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 0;
+    box-shadow: none !important;
+    opacity: 1;
+  }
+
+  .modular-grid .react-grid-item:hover .modular-grid-handle {
+    opacity: 1;
+  }
+
+  .modular-grid .modular-grid-handle:hover {
+    background: transparent !important;
+  }
+
+  .modular-grid .modular-grid-handle-dot {
+    display: none;
+  }
+
+  .modular-grid .react-grid-item > .react-resizable-handle::after {
+    border-right: 0 !important;
+    border-bottom: 0 !important;
+  }
+
+  .modular-grid .react-resizable-handle {
+    background: transparent !important;
+  }
+
+  .modular-grid .modular-grid-handle.left-0 {
+    left: -0.45rem;
+  }
+
+  .modular-grid .modular-grid-handle.right-0 {
+    right: -0.45rem;
+  }
+
+  .modular-grid .modular-grid-handle.top-0 {
+    top: -0.45rem;
+  }
+
+  .modular-grid .modular-grid-handle.bottom-0 {
+    bottom: -0.45rem;
+  }
+
+  .modular-grid .modular-grid-handle.left-0.top-0 {
+    border-left: 2px solid color-mix(in oklab, var(--ring) 65%, transparent) !important;
+    border-top: 2px solid color-mix(in oklab, var(--ring) 65%, transparent) !important;
+  }
+
+  .modular-grid .modular-grid-handle.right-0.top-0 {
+    border-right: 2px solid color-mix(in oklab, var(--ring) 65%, transparent) !important;
+    border-top: 2px solid color-mix(in oklab, var(--ring) 65%, transparent) !important;
+  }
+
+  .modular-grid .modular-grid-handle.left-0.bottom-0 {
+    border-left: 2px solid color-mix(in oklab, var(--ring) 65%, transparent) !important;
+    border-bottom: 2px solid color-mix(in oklab, var(--ring) 65%, transparent) !important;
+  }
+
+  .modular-grid .modular-grid-handle.right-0.bottom-0 {
+    border-right: 2px solid color-mix(in oklab, var(--ring) 65%, transparent) !important;
+    border-bottom: 2px solid color-mix(in oklab, var(--ring) 65%, transparent) !important;
+  }
+
+  .modular-grid .react-grid-item.react-draggable-dragging .modular-grid-handle.left-0.top-0,
+  .modular-grid .react-grid-item.resizing .modular-grid-handle.left-0.top-0 {
+    border-left: 2px solid color-mix(in oklab, black 70%, var(--ring)) !important;
+    border-top: 2px solid color-mix(in oklab, black 70%, var(--ring)) !important;
+  }
+
+  .modular-grid .react-grid-item.react-draggable-dragging .modular-grid-handle.right-0.top-0,
+  .modular-grid .react-grid-item.resizing .modular-grid-handle.right-0.top-0 {
+    border-right: 2px solid color-mix(in oklab, black 70%, var(--ring)) !important;
+    border-top: 2px solid color-mix(in oklab, black 70%, var(--ring)) !important;
+  }
+
+  .modular-grid .react-grid-item.react-draggable-dragging .modular-grid-handle.left-0.bottom-0,
+  .modular-grid .react-grid-item.resizing .modular-grid-handle.left-0.bottom-0 {
+    border-left: 2px solid color-mix(in oklab, black 70%, var(--ring)) !important;
+    border-bottom: 2px solid color-mix(in oklab, black 70%, var(--ring)) !important;
+  }
+
+  .modular-grid .react-grid-item.react-draggable-dragging .modular-grid-handle.right-0.bottom-0,
+  .modular-grid .react-grid-item.resizing .modular-grid-handle.right-0.bottom-0 {
+    border-right: 2px solid color-mix(in oklab, black 70%, var(--ring)) !important;
+    border-bottom: 2px solid color-mix(in oklab, black 70%, var(--ring)) !important;
   }
 }

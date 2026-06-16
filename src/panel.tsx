@@ -1,11 +1,11 @@
 import type { MessageEvent, PanelExtensionContext } from "@foxglove/extension";
-import React, { useEffect, useLayoutEffect, useMemo, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useState } from "react";
+import type { ReactElement } from "react";
 import { createRoot } from "react-dom/client";
 
-import { MainTabs } from "./components/main-tabs";
-import { ThemeProvider } from "./components/theme-provider";
-import { useMainPanelSettings } from "./extension-settings";
-
+import { App } from "@/app";
+import { usePanelSettings } from "@/components/extension-settings";
+import { ThemeProvider } from "@/components/theme-provider";
 import {
   ApplicationStatus,
   BatteryStatus,
@@ -28,30 +28,32 @@ import {
   USSensorRear,
 } from "@/schemas";
 
+const prefix = "/zhaw_nina";
+
 const TOPICS = {
-  applicationStatus: "/application_status",
-  batteryStatus: "/battery_status",
-  generalVehicleStatus: "/general_vehicle_status",
-  scaledSignals: "/scaled_signals",
-  steeringAndSpeed: "/steering_and_speed",
-  temperatures: "/temperatures",
-  rawSignalBrake: "/raw_signal_brake",
-  rawSignalThrottle: "/raw_signal_throttle",
-  rawSignalSteeringPosition: "/raw_signal_steering_position",
-  rawSignalSteeringForce: "/raw_signal_steering_force",
-  rawSignalSteeringVelocity: "/raw_signal_steering_velocity",
-  rawSignalSteeringVelocityCmd: "/raw_signal_steering_velocity_cmd",
-  rawSignalThrottlePotiCmd: "/raw_signal_throttle_poti_cmd",
-  rawSignalVehicleSpeed: "/raw_signal_vehicle_speed",
-  usSensorFront: "/us_sensor_front",
-  usSensorRear: "/us_sensor_rear",
-  remoteDriveRequest: "/remote_drive_request",
-  remoteIndicatorRequest: "/remote_indicator_request",
-  remoteApplicationToggleRequest: "/remote_application_toggle_request",
+  applicationStatus: `${prefix}/application_status`,
+  batteryStatus: `${prefix}/battery_status`,
+  generalVehicleStatus: `${prefix}/general_vehicle_status`,
+  scaledSignals: `${prefix}/scaled_signals`,
+  steeringAndSpeed: `${prefix}/steering_and_speed`,
+  temperatures: `${prefix}/temperatures`,
+  rawSignalBrake: `${prefix}/raw_signal_brake`,
+  rawSignalThrottle: `${prefix}/raw_signal_throttle`,
+  rawSignalSteeringPosition: `${prefix}/raw_signal_steering_position`,
+  rawSignalSteeringForce: `${prefix}/raw_signal_steering_force`,
+  rawSignalSteeringVelocity: `${prefix}/raw_signal_steering_velocity`,
+  rawSignalSteeringVelocityCmd: `${prefix}/raw_signal_steering_velocity_cmd`,
+  rawSignalThrottlePotiCmd: `${prefix}/raw_signal_throttle_poti_cmd`,
+  rawSignalVehicleSpeed: `${prefix}/raw_signal_vehicle_speed`,
+  usSensorFront: `${prefix}/u_s_sensor_front`,
+  usSensorRear: `${prefix}/u_s_sensor_rear`,
+  remoteDriveRequest: `${prefix}/remote_drive_request`,
+  remoteIndicatorRequest: `${prefix}/remote_indicator_request`,
+  remoteApplicationToggleRequest: `${prefix}/remote_application_toggle_request`,
 } as const;
 
-function MainPanel({ context }: { context: PanelExtensionContext }): JSX.Element {
-  const settings = useMainPanelSettings(context);
+function Panel({ context }: { context: PanelExtensionContext }): ReactElement {
+  const settings = usePanelSettings(context);
   const [applicationStatus, setApplicationStatus] = useState<ApplicationStatus>();
   const [batteryStatus, setBatteryStatus] = useState<BatteryStatus>();
   const [generalVehicleStatus, setGeneralVehicleStatus] = useState<GeneralVehicleStatus>();
@@ -157,7 +159,6 @@ function MainPanel({ context }: { context: PanelExtensionContext }): JSX.Element
     };
 
     context.watch("currentFrame");
-    context.watch("colorScheme");
 
     context.subscribe(Object.values(TOPICS).map((topic) => ({ topic })));
   }, [context, topicHandlers]);
@@ -218,27 +219,27 @@ function MainPanel({ context }: { context: PanelExtensionContext }): JSX.Element
   );
 
   return (
-    <>
-      <MainTabs
+    <ThemeProvider defaultTheme="system">
+      <App
         data={panelData}
         activeTab={activeTab}
         onTabChange={setActiveTab}
         defaultTab={settings.tabs.defaultTab}
         showMenuBar={!settings.tabs.hideMenuBar}
+        showParkSensorDisplay={!settings.parkSensors.hideDisplay}
+        showParkSensorControls={!settings.parkSensors.hideControls}
       />
-    </>
+    </ThemeProvider>
   );
 }
 
-export function initMainPanel(context: PanelExtensionContext): () => void {
+export function initPanel(context: PanelExtensionContext): () => void {
   const root = createRoot(context.panelElement);
 
   root.render(
-    <ThemeProvider defaultTheme="dark">
-      <div className="h-full w-full bg-background">
-        <MainPanel context={context} />
-      </div>
-    </ThemeProvider>,
+    <div className="h-full w-full bg-background">
+      <Panel context={context} />
+    </div>,
   );
 
   // Return a function to run when the panel is removed

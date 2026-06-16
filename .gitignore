@@ -20,9 +20,6 @@ dist
 tsconfig.tsbuildinfo
 test.lib/
 
-# Visual Studio Code configs
-.vscode/
-
 # JetBrains IDEs
 .idea/
 
@@ -55,3 +52,4 @@ __fixtures__/custom-modules-dir/cache/
 __fixtures__/custom-modules-dir/patches/
 
 .pnpm-store
+*.foxe
